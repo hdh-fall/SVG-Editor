@@ -43,17 +43,18 @@ export class GroupCommand implements Command {
     }
     doc.attach(this.group, this.groupLocation!);
     for (const member of this.members) {
-      this.group.insert(member);
+      doc.attach(member, { parent: this.group, index: this.group.children.length });
     }
   }
 
   public undo(ctx: AppContext): void {
     const doc = ctx.requireDocument();
     if (this.group === null) return;
-    doc.detach(this.group);
     this.members.forEach((member, index) => {
+      doc.detach(member);
       doc.attach(member, this.memberLocations[index]!);
     });
+    doc.detach(this.group);
   }
 
   public successMessage(): string {

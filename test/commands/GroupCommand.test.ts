@@ -44,6 +44,18 @@ describe('GroupCommand', () => {
     expect(doc.requireContainer('mid').children.map((s) => s.id)).toEqual(['c', 'b']);
   });
 
+  it('keeps every grouped member findable by id', () => {
+    const ctx = makeContext();
+    const doc = ctx.requireDocument();
+    run('create circle c 5 5 1', ctx);
+    run('create rect b 0 0 1 1', ctx);
+
+    run('group mid c b', ctx);
+    expect(doc.requireShape('c').id).toBe('c');
+    expect(doc.requireShape('b').id).toBe('b');
+    expect(doc.find('mid')).toBe(doc.requireContainer('mid'));
+  });
+
   it('undo restores every member to its original parent and index', () => {
     const ctx = makeContext();
     const doc = ctx.requireDocument();
@@ -55,6 +67,19 @@ describe('GroupCommand', () => {
     cmd.undo(ctx);
     expect(doc.children.map((s) => s.id)).toEqual(['a', 'c', 'b']);
     expect(doc.find('mid')).toBeNull();
+  });
+
+  it('redo after undo holds each member exactly once', () => {
+    const ctx = makeContext();
+    const doc = ctx.requireDocument();
+    run('create circle c 5 5 1', ctx);
+    run('create rect b 0 0 1 1', ctx);
+    const cmd = run('group mid c b', ctx) as GroupCommand;
+
+    cmd.undo(ctx);
+    cmd.execute(ctx);
+    expect(doc.requireContainer('mid').children.map((s) => s.id)).toEqual(['c', 'b']);
+    expect(doc.children.map((s) => s.id)).toEqual(['mid']);
   });
 
   it('refuses to fold a container together with its own descendant', () => {
