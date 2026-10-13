@@ -4428,7 +4428,7 @@ import type { Command } from './Command';
 export class ReadCommand implements Command {
   public readonly isUndoable = false;
 
-  private warnings: readonly string[] = [];
+  private storedWarnings: readonly string[] = [];
   private elementCount = 0;
 
   public constructor(private readonly path: string) {}
@@ -4446,12 +4446,12 @@ export class ReadCommand implements Command {
     const result = new SvgReader(ctx.factory).read(text, this.path);
     ctx.setDocument(result.document);
     ctx.setSavePath(this.path);
-    this.warnings = result.warnings;
+    this.storedWarnings = result.warnings;
     this.elementCount = result.document.count();
   }
 
   public warnings(): readonly string[] {
-    return this.warnings;
+    return this.storedWarnings;
   }
 
   public undo(_ctx: AppContext): void {

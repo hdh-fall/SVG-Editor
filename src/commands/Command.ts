@@ -9,6 +9,8 @@ export interface Command {
    * They execute but never enter, clear, or lock the undo stacks (spec §4.3).
    */
   readonly isDisplay?: boolean;
+  /** Extra lines to print before the success message (e.g. `read` auto-id warnings). */
+  warnings?(): readonly string[];
   /** Validate fully before mutating: a throwing `execute` must leave state untouched. */
   execute(ctx: AppContext): void;
   undo(ctx: AppContext): void;
