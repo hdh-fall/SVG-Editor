@@ -1,4 +1,5 @@
 import type { SvgNode } from './SvgNode';
+import type { Container } from './Container';
 import { UnknownAttributeError } from './errors';
 import { formatNumber, parseNumber } from './format';
 
@@ -12,6 +13,9 @@ import { formatNumber, parseNumber } from './format';
  */
 export abstract class Shape {
   public readonly id: string;
+
+  /** Owning container; `null` only for the document root itself. */
+  public parent: Container | null = null;
 
   private fillValue: string | undefined;
   private strokeValue: string | undefined;
@@ -32,6 +36,11 @@ export abstract class Shape {
 
   public isContainer(): boolean {
     return false;
+  }
+
+  /** Runtime narrowing helper, so callers never need `instanceof`. */
+  public asContainer(): Container | null {
+    return null;
   }
 
   /** True for plugin types like `box` whose internals are not user-editable (spec §4.4). */
