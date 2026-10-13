@@ -42,6 +42,12 @@ export class UnknownShapeTypeError extends AppError {
   }
 }
 
+export class UnknownCommandError extends AppError {
+  public constructor(name: string) {
+    super(`unknown command: ${name}`);
+  }
+}
+
 export class UnknownAttributeError extends AppError {
   public constructor(attr: string) {
     super(`unknown attribute: ${attr}`);
