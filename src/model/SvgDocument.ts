@@ -50,6 +50,11 @@ export class SvgDocument extends Container {
     this.canvasHeight = height;
   }
 
+  /** Number of shapes in the tree, excluding the root (the spec's "(N elements)"). */
+  public count(): number {
+    return this.index.size - 1;
+  }
+
   public find(id: string): Shape | null {
     return this.index.get(id) ?? null;
   }
