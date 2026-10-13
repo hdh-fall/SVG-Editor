@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build / test output
+dist/
+coverage/
+
+# logs
+*.log
+npm-debug.log*
+
+# editors & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# local tooling settings
+.claude/
