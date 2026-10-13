@@ -1493,7 +1493,7 @@ describe('createDefaultShapeFactory', () => {
   });
 
   it('builds an empty group', () => {
-    const group = factory.providerFor('g').create('g1', new Map());
+    const group = factory.providerFor('g').create('g1', new Map()) as Group;
     expect(group).toBeInstanceOf(Group);
     expect(group.children).toHaveLength(0);
   });
@@ -1728,7 +1728,6 @@ export const gProvider: ShapeProvider = {
 Create `src/shapes/ShapeFactory.ts`:
 
 ```ts
-import type { Shape } from '../model/Shape';
 import { UnknownShapeTypeError } from '../model/errors';
 import type { ShapeProvider } from './ShapeProvider';
 import { circleProvider } from './builtin/circleProvider';
