@@ -295,17 +295,17 @@ describe('Rect', () => {
   it('translates by mutating x and y only', () => {
     const r = new Rect('r1', 10, 20, 100, 50);
     r.translate(30, -5);
-    expect(r.x).toBe(40);
-    expect(r.y).toBe(15);
-    expect(r.width).toBe(100);
+    expect(r.getAttr('x')).toBe('40');
+    expect(r.getAttr('y')).toBe('15');
+    expect(r.getAttr('width')).toBe('100');
   });
 
   it('scales position and size together', () => {
     const r = new Rect('r1', 10, 20, 100, 50);
     r.scaleBy(2);
-    expect(r.x).toBe(20);
-    expect(r.width).toBe(200);
-    expect(r.height).toBe(100);
+    expect(r.getAttr('x')).toBe('20');
+    expect(r.getAttr('width')).toBe('200');
+    expect(r.getAttr('height')).toBe('100');
   });
 
   it('sets geometry, fill and stroke-width', () => {
@@ -313,7 +313,7 @@ describe('Rect', () => {
     r.setAttr('width', '250');
     r.setAttr('fill', '#eee');
     r.setAttr('stroke-width', '3');
-    expect(r.width).toBe(250);
+    expect(r.getAttr('width')).toBe('250');
     expect(r.toXml().attrs).toEqual({
       id: 'r1',
       x: '0',
@@ -353,7 +353,6 @@ Expected: FAIL — cannot resolve `../../src/model/Rect`.
 Create `src/model/Shape.ts`:
 
 ```ts
-import type { Container } from './Container';
 import type { SvgNode } from './SvgNode';
 import { UnknownAttributeError } from './errors';
 import { formatNumber, parseNumber } from './format';
@@ -365,11 +364,12 @@ import { formatNumber, parseNumber } from './format';
  * `setAttr` is polymorphic: the base handles presentation, the subclass handles
  * geometry, and anything left over is an error — there is no central switch on
  * shape type anywhere in the codebase.
+ *
+ * Task 4 adds the `parent: Container | null` field (and its `import type { Container }`)
+ * when `Container` exists.
  */
 export abstract class Shape {
   public readonly id: string;
-  /** Owning container; `null` only for the document root itself. */
-  public parent: Container | null = null;
 
   private fillValue: string | undefined;
   private strokeValue: string | undefined;
@@ -966,7 +966,7 @@ git commit -m "feat(model): add Circle, Ellipse, Line and Text shapes"
 **Files:**
 - Create: `src/model/Container.ts`
 - Create: `src/model/Group.ts`
-- Modify: `src/model/Shape.ts` (add `asContainer`)
+- Modify: `src/model/Shape.ts` (add `parent` and `asContainer`)
 - Test: `test/model/Group.test.ts`
 
 - [ ] **Step 1: Write the failing test**
@@ -1049,9 +1049,24 @@ describe('Group', () => {
 Run: `npx vitest run test/model/Group.test.ts`
 Expected: FAIL — cannot resolve `../../src/model/Group`.
 
-- [ ] **Step 3: Add `asContainer` to `Shape`**
+- [ ] **Step 3: Add `parent` and `asContainer` to `Shape`**
 
-In `src/model/Shape.ts`, add this method immediately after `isContainer()`:
+`Container` exists now, so the base class can finally refer to it. In `src/model/Shape.ts`:
+
+a) Add this import as the first line of the file:
+
+```ts
+import type { Container } from './Container';
+```
+
+b) Add the `parent` field immediately after the `id` field:
+
+```ts
+  /** Owning container; `null` only for the document root itself. */
+  public parent: Container | null = null;
+```
+
+c) Add this method immediately after `isContainer()`:
 
 ```ts
   /** Runtime narrowing helper, so callers never need `instanceof`. */
