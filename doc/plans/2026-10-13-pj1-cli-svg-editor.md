@@ -2994,13 +2994,14 @@ describe('UngroupCommand', () => {
   it('hoists children into the parent at the group position', () => {
     const ctx = makeContext();
     const doc = ctx.requireDocument();
-    run('create rect a 0 0 1 1', ctx);
-    run('create circle c 5 5 1', ctx);
-    run('create rect b 0 0 1 1', ctx);
+    run('create g outer', ctx);
+    run('create rect a 0 0 1 1 in outer', ctx);
+    run('create circle c 5 5 1 in outer', ctx);
+    run('create rect b 0 0 1 1 in outer', ctx);
     run('group mid c b', ctx);
 
     run('ungroup mid', ctx);
-    expect(doc.children.map((s) => s.id)).toEqual(['a', 'c', 'b']);
+    expect(doc.requireContainer('outer').children.map((s) => s.id)).toEqual(['a', 'c', 'b']);
     expect(doc.find('mid')).toBeNull();
   });
 
