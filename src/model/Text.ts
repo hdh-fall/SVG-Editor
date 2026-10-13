@@ -30,6 +30,10 @@ export class Text extends Shape {
     return `(${formatNumber(this.x)},${formatNumber(this.y)}) "${this.content}"`;
   }
 
+  public override positionAnchor(): readonly [number, number] {
+    return [this.x, this.y];
+  }
+
   public override toXml(): SvgNode {
     return {
       tag: 'text',

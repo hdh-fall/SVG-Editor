@@ -33,6 +33,10 @@ export class Ellipse extends Shape {
     return `cx=${formatNumber(this.cx)} cy=${formatNumber(this.cy)} rx=${formatNumber(this.rx)} ry=${formatNumber(this.ry)}`;
   }
 
+  public override positionAnchor(): readonly [number, number] {
+    return [this.cx, this.cy];
+  }
+
   protected geometryAttrs(): Record<string, string> {
     return {
       cx: formatNumber(this.cx),

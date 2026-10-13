@@ -12,6 +12,8 @@ import { formatNumber, parseNumber } from './format';
  * shape type anywhere in the codebase.
  */
 export abstract class Shape {
+  private static readonly PRESENTATION_ATTRS = new Set(['fill', 'stroke', 'stroke-width']);
+
   public readonly id: string;
 
   /** Owning container; `null` only for the document root itself. */
@@ -41,6 +43,33 @@ export abstract class Shape {
   /** Runtime narrowing helper, so callers never need `instanceof`. */
   public asContainer(): Container | null {
     return null;
+  }
+
+  /** First point of the shape, for `move` feedback; `null` for containers (spec §6). */
+  public positionAnchor(): readonly [number, number] | null {
+    return null;
+  }
+
+  /** True when `setAttr(name, …)` would succeed — used to validate without mutating. */
+  public canSet(name: string): boolean {
+    return Shape.PRESENTATION_ATTRS.has(name) || this.getGeometryAttr(name) !== undefined;
+  }
+
+  /** Remove an optional presentation attribute (undo of setting a previously unset one). */
+  public unsetAttr(name: string): void {
+    if (name === 'fill') {
+      this.fillValue = undefined;
+      return;
+    }
+    if (name === 'stroke') {
+      this.strokeValue = undefined;
+      return;
+    }
+    if (name === 'stroke-width') {
+      this.strokeWidthValue = undefined;
+      return;
+    }
+    throw new UnknownAttributeError(name);
   }
 
   /** True for plugin types like `box` whose internals are not user-editable (spec §4.4). */

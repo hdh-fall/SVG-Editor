@@ -35,6 +35,10 @@ export class Line extends Shape {
     return `(${formatNumber(this.x1)},${formatNumber(this.y1)}) -> (${formatNumber(this.x2)},${formatNumber(this.y2)})`;
   }
 
+  public override positionAnchor(): readonly [number, number] {
+    return [this.x1, this.y1];
+  }
+
   protected geometryAttrs(): Record<string, string> {
     return {
       x1: formatNumber(this.x1),

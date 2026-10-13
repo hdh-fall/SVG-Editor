@@ -33,6 +33,10 @@ export class Rect extends Shape {
     return `x=${formatNumber(this.x)} y=${formatNumber(this.y)} w=${formatNumber(this.width)} h=${formatNumber(this.height)}`;
   }
 
+  public override positionAnchor(): readonly [number, number] {
+    return [this.x, this.y];
+  }
+
   protected geometryAttrs(): Record<string, string> {
     return {
       x: formatNumber(this.x),

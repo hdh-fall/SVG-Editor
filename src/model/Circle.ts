@@ -30,6 +30,10 @@ export class Circle extends Shape {
     return `cx=${formatNumber(this.cx)} cy=${formatNumber(this.cy)} r=${formatNumber(this.r)}`;
   }
 
+  public override positionAnchor(): readonly [number, number] {
+    return [this.cx, this.cy];
+  }
+
   protected geometryAttrs(): Record<string, string> {
     return {
       cx: formatNumber(this.cx),
