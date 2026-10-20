@@ -1,3 +1,4 @@
+import { FileError } from '../model/errors';
 import type { FileStore } from './FileStore';
 
 export class MemoryFileStore implements FileStore {
@@ -6,7 +7,7 @@ export class MemoryFileStore implements FileStore {
   public read(path: string): string {
     const content = this.files.get(path);
     if (content === undefined) {
-      throw new Error(`missing file: ${path}`);
+      throw FileError.read(path);
     }
     return content;
   }
