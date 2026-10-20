@@ -10,7 +10,12 @@ const parser = new CommandParser();
 
 function build(line: string, ctx: ReturnType<typeof makeContext>) {
   const parsed = parser.parse(line)!;
-  const builders = { init: InitCommand, create: CreateCommand, tree: TreeCommand, show: ShowCommand };
+  const builders = {
+    init: InitCommand,
+    create: CreateCommand,
+    tree: TreeCommand,
+    show: ShowCommand,
+  };
   const cmd = builders[parsed.name as keyof typeof builders].fromArgs(parsed, ctx);
   cmd.execute(ctx);
   return cmd;

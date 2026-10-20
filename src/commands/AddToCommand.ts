@@ -1,9 +1,6 @@
 import type { NodeLocation } from '../model/SvgDocument';
 import type { Shape } from '../model/Shape';
-import {
-  CannotGroupIntoDescendantError,
-  InvalidArgumentError,
-} from '../model/errors';
+import { CannotGroupIntoDescendantError, InvalidArgumentError } from '../model/errors';
 import type { ParsedCommand } from '../parser/CommandParser';
 import type { AppContext } from './AppContext';
 import type { Command } from './Command';

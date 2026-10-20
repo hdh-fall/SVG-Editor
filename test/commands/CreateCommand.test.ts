@@ -28,9 +28,12 @@ describe('CreateCommand', () => {
     const cmd = build('create rect start 120 100 160 60 #4a90d9 in node1', ctx) as CreateCommand;
     cmd.execute(ctx);
     expect(cmd.successMessage()).toBe('rect#start created in g#node1');
-    expect(ctx.requireDocument().requireContainer('node1').children.map((s) => s.id)).toEqual([
-      'start',
-    ]);
+    expect(
+      ctx
+        .requireDocument()
+        .requireContainer('node1')
+        .children.map((s) => s.id),
+    ).toEqual(['start']);
   });
 
   it('rejects a duplicate id', () => {
@@ -74,9 +77,12 @@ describe('DeleteCommand', () => {
 
     cmd.undo(ctx);
     expect(cmd.undoMessage()).toBe('rect#box restored into g#markers');
-    expect(ctx.requireDocument().requireContainer('markers').children.map((s) => s.id)).toEqual([
-      'box',
-    ]);
+    expect(
+      ctx
+        .requireDocument()
+        .requireContainer('markers')
+        .children.map((s) => s.id),
+    ).toEqual(['box']);
   });
 
   it('rejects an unknown id without touching the document', () => {

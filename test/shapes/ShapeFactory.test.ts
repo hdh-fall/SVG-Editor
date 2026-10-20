@@ -16,13 +16,16 @@ describe('createDefaultShapeFactory', () => {
   });
 
   it('builds a rect from its attribute record', () => {
-    const rect = factory.providerFor('rect').create('r1', new Map([
-      ['x', '10'],
-      ['y', '20'],
-      ['width', '100'],
-      ['height', '50'],
-      ['fill', '#eee'],
-    ]));
+    const rect = factory.providerFor('rect').create(
+      'r1',
+      new Map([
+        ['x', '10'],
+        ['y', '20'],
+        ['width', '100'],
+        ['height', '50'],
+        ['fill', '#eee'],
+      ]),
+    );
     expect(rect).toBeInstanceOf(Rect);
     expect(rect.toXml().attrs).toEqual({
       id: 'r1',
@@ -41,11 +44,14 @@ describe('createDefaultShapeFactory', () => {
   });
 
   it('keeps text content out of the attribute list', () => {
-    const text = factory.providerFor('text').create('t1', new Map([
-      ['x', '20'],
-      ['y', '40'],
-      ['text', 'My Diagram'],
-    ]));
+    const text = factory.providerFor('text').create(
+      't1',
+      new Map([
+        ['x', '20'],
+        ['y', '40'],
+        ['text', 'My Diagram'],
+      ]),
+    );
     expect(text).toBeInstanceOf(Text);
     expect(text.toXml()).toEqual({
       tag: 'text',

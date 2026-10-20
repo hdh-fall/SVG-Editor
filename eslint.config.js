@@ -8,10 +8,7 @@ export default tseslint.config(
   {
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/explicit-member-accessibility': [
-        'warn',
-        { accessibility: 'explicit' },
-      ],
+      '@typescript-eslint/explicit-member-accessibility': ['warn', { accessibility: 'explicit' }],
     },
   },
 );
