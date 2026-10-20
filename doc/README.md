@@ -18,7 +18,7 @@ front / back` 等编辑操作，支持 `tree / show / help` 查看，以及 `und
 
 | 目录 | 职责 | 关键类 / 接口 |
 |---|---|---|
-| `src/model/` | **领域核心**：纯内存对象树与几何语义，不依赖任何外层模块 | `Shape`(抽象基类) · `Container`(抽象) · `Group` · `Rect` / `Circle` / `Ellipse` / `Line` / `Text` · `SvgDocument` · `errors.ts` |
+| `src/model/` | **领域核心**：纯内存对象树与几何语义，不依赖任何外层模块 | `Shape`(抽象基类) · `Container`(抽象) · `Group` · `Rect` / `Circle` / `Ellipse` / `Line` / `Text` · `SvgDocument` · `errors/`(每类一文件，`errors.ts` 仅作汇总导出) |
 | `src/shapes/` | 图形类型注册与插件缝（按名分派的唯一两处之一） | `ShapeProvider`(接口) · `ShapeFactory` · `builtin/` 六个内置 Provider |
 | `src/commands/` | Command 模式的落地：一类一文件（按名分派的唯一两处之一） | `Command`(接口) · 各具体命令类 · `CommandRegistry` |
 | `src/history/` | 撤销/重做双栈，以及"IO 命令后锁定"的策略 | `HistoryManager` |
@@ -33,13 +33,35 @@ front / back` 等编辑操作，支持 `tree / show / help` 查看，以及 `und
 ```plantuml
 @startuml
 skinparam componentStyle rectangle
-package "cli"      { [Repl] [OutputFormatter] }
-package "parser"   { [Tokenizer] [CommandParser] }
-package "commands" { [CommandRegistry] [Command] }
-package "history"  { [HistoryManager] }
-package "model"    { [Shape / Container / Group] [SvgDocument] }
-package "shapes"   { [ShapeFactory] [ShapeProvider] }
-package "io"       { [SvgWriter] [SvgReader] [FileStore] }
+
+package "cli" {
+  [Repl]
+  [OutputFormatter]
+}
+package "parser" {
+  [Tokenizer]
+  [CommandParser]
+}
+package "commands" {
+  [CommandRegistry]
+  [Command]
+}
+package "history" {
+  [HistoryManager]
+}
+package "model" {
+  [Shape / Container / Group]
+  [SvgDocument]
+}
+package "shapes" {
+  [ShapeFactory]
+  [ShapeProvider]
+}
+package "io" {
+  [SvgWriter]
+  [SvgReader]
+  [FileStore]
+}
 
 [Repl] --> [Tokenizer]
 [Repl] --> [CommandParser]
@@ -168,9 +190,10 @@ AI 最初倾向"符合 SVG 惯例"地给 `<g>` 写入 `transform` 属性。检�
 
 ### 2.5 tree 输出的列宽偏差
 
-规范 §5.1 的树形示例把几何摘要对齐到第 19 列，但 §6.1 / §4.4 的示例分别对齐到第 29 / 31 列，
-规范自身不一致，无法逐字节复现。实现固定采用**第 19 列、至少一个空格**，集成测试对空白做归一化
-（`\s+ → 单空格` 并去首尾空白）后再比对，从而既验证内容与顺序，又不被列宽差异干扰。
+规范 §5.1 的树形示例把几何摘要对齐到第 19 列，但 §6.1 的示例对齐到第 29 列，§4.4 的两处示例
+分别为第 18 / 26 列——规范自身不一致，无法逐字节复现。实现固定采用**第 19 列、至少一个空格**，
+集成测试对空白做归一化（`\s+ → 单空格` 并去首尾空白）后再比对，从而既验证内容与顺序，又不被
+列宽差异干扰。
 
 同一段会话回放还暴露了缩进前缀的另一个坑：规范 §5.1 / §6 对"非末位父节点"的子级使用 `│   `
 竖线续行前缀——末位父节点的子级缩进四个空格（如 §6 的 `g#markers` 是全树最后一个子节点），
@@ -192,6 +215,27 @@ Task 15 完成后，用规范 §6 的完整会话在真实终端逐行回放，�
 group；同时补了两个回归测试（"每个成员按 id 仍可查"、"undo 后 redo 每个成员恰好一次"）。此修复作为
 独立的 `fix(commands): …` 提交，未与功能提交混在一起。教训：**集成回放不可省略**——只跑单元测试时
 这两个缺陷都是隐形的。
+
+### 2.7 交付前的全量复查
+
+推送前又做了一轮"逐文件通读 + 真实终端回放 + 规范条款逐条比对"，修正了以下问题：
+
+- **浮点噪声出现在回显里**：`move` 的 `moved to (…)` 直接拼接原始数字，`0.1 + 0.2` 会打印成
+  `0.30000000000000004`。树形/`show` 走了 `formatNumber` 所以看不出来，但编辑回显没有。改为所有
+  坐标回显统一经 `formatNumber`（保留 6 位小数、去掉尾随 `.0`）。
+- **`errors.ts` 一个文件里挤了 18 个类**，与规范"一类一文件（文件名 = 类名）"不符。拆成
+  `src/model/errors/` 下每类一文件，`errors.ts` 仅作汇总导出，所有 `from './errors'` 的调用点
+  无需改动。
+- **`Shape.parent` 是公开可写字段**。改为私有字段 + 只读 getter，写入只能走 `setParent()`，
+  由 `Container.insert/removeAt` 维护，符合"字段封装"。
+- **`MemoryFileStore` 缺文件时抛裸 `Error`**，与 `NodeFileStore` 的 `FileError.read` 不一致；
+  统一为同一错误类型，测试与生产行为一致。
+- **Prettier 未全量通过**（8 个文件）。`npm run format` 后 `prettier --check` 全绿。
+- **文档自身的两处数字不准确**：§2.5 原写"§6.1 / §4.4 对齐到 29 / 31 列"，实际 §4.4 的两处示例
+  是 18 / 26 列；§四 的覆盖率数字按修正后的实测结果更新（行覆盖 86.0%）。
+
+复查结论：规范 §3 命令总表、§4.2 错误信息、§5 显示格式、§6 / §6.1 两段 transcript 均逐条比对通过；
+`src/` 全文无 `switch(tag)`、无 `any`、无被跳过的测试。
 
 ---
 
@@ -235,9 +279,9 @@ group；同时补了两个回归测试（"每个成员按 id 仍可查"、"undo 
 - **可复现的命令**：`npm test`（Vitest 全量）、`npm run typecheck`（`tsc --noEmit`）、
   `npm run lint`（ESLint）、`npm run coverage`（`vitest run --coverage`，v8 provider）。
 - **提交时的实测结果**：全量 **107 个测试全部通过**（19 个测试文件）；`tsc --noEmit` 与
-  `eslint .` 均零告警。覆盖率（行）实测：总体 **85.9%**，分模块 `history` 96.9%、`cli` 92.6%、
-  `commands` 86.9%、`io` 84.9%、`model` 79.5%。`model` 偏低主要落在 `Ellipse` / `Line` 的几何
-  分支；`io/NodeFileStore`（真实文件系统适配器）与 `main.ts`（纯组装）**不在测试范围内**，故近
-  0% 覆盖——两者都只是一层薄适配，逻辑已在 `MemoryFileStore` 与集成测试中覆盖。
+  `eslint .` 均零告警。覆盖率（行）实测：总体 **86.0%**（857/997），分模块 `history` 96.9%、
+  `cli` 92.6%、`commands` 86.9%、`io` 84.9%、`model` 78.9%。`model` 偏低主要落在 `Ellipse` /
+  `Line` 的几何分支；`io/NodeFileStore`（真实文件系统适配器）与 `main.ts`（纯组装）**不在测试范围内**，
+  故近 0% 覆盖——两者都只是一层薄适配，逻辑已在 `MemoryFileStore` 与集成测试中覆盖。
 - **手工冒烟**：按规范 §6 / §6.1 的两段 transcript 在真实终端（`npm run cli`）逐条回放，
   输出与文档一致——正是这一步骤揪出了 2.6 记录的两个真实缺陷。
