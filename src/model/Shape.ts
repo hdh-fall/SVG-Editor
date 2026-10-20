@@ -16,8 +16,20 @@ export abstract class Shape {
 
   public readonly id: string;
 
+  private parentValue: Container | null = null;
+
   /** Owning container; `null` only for the document root itself. */
-  public parent: Container | null = null;
+  public get parent(): Container | null {
+    return this.parentValue;
+  }
+
+  /**
+   * Maintained only by `Container.insert` / `Container.removeAt`; callers mutate
+   * structure through `SvgDocument.attach` / `SvgDocument.detach`, never directly.
+   */
+  public setParent(parent: Container | null): void {
+    this.parentValue = parent;
+  }
 
   private fillValue: string | undefined;
   private strokeValue: string | undefined;

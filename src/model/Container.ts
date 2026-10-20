@@ -30,7 +30,7 @@ export abstract class Container extends Shape {
       throw new RangeError(`insert index ${index} out of range`);
     }
     this.childList.splice(index, 0, child);
-    child.parent = this;
+    child.setParent(this);
   }
 
   public removeAt(index: number): Shape {
@@ -38,7 +38,7 @@ export abstract class Container extends Shape {
     if (removed === undefined) {
       throw new RangeError(`remove index ${index} out of range`);
     }
-    removed.parent = null;
+    removed.setParent(null);
     return removed;
   }
 
