@@ -1,5 +1,5 @@
 import { InvalidArgumentError } from '../model/errors';
-import { parseNumber } from '../model/format';
+import { formatNumber, parseNumber } from '../model/format';
 import type { ParsedCommand } from '../parser/CommandParser';
 import type { AppContext } from './AppContext';
 import type { Command } from './Command';
@@ -41,19 +41,21 @@ export class MoveCommand implements Command {
 
   public successMessage(): string {
     return this.container
-      ? `${this.label} moved by (${this.dx},${this.dy})`
+      ? `${this.label} moved by (${formatNumber(this.dx)},${formatNumber(this.dy)})`
       : `${this.label} moved to ${this.afterAnchor}`;
   }
 
   public undoMessage(): string {
     return this.container
-      ? `${this.label} moved back by (${-this.dx},${-this.dy})`
+      ? `${this.label} moved back by (${formatNumber(-this.dx)},${formatNumber(-this.dy)})`
       : `${this.label} moved back to ${this.beforeAnchor}`;
   }
 
-  private static anchor(shape: { positionAnchor(): readonly [number, number] | null }): string | null {
+  private static anchor(shape: {
+    positionAnchor(): readonly [number, number] | null;
+  }): string | null {
     const point = shape.positionAnchor();
     if (point === null) return null;
-    return `(${point[0]},${point[1]})`;
+    return `(${formatNumber(point[0])},${formatNumber(point[1])})`;
   }
 }

@@ -1,5 +1,5 @@
 import { InvalidArgumentError, InvalidScaleFactorError } from '../model/errors';
-import { parseNumber } from '../model/format';
+import { formatNumber, parseNumber } from '../model/format';
 import type { ParsedCommand } from '../parser/CommandParser';
 import type { AppContext } from './AppContext';
 import type { Command } from './Command';
@@ -33,11 +33,14 @@ export class ScaleCommand implements Command {
   }
 
   public undo(ctx: AppContext): void {
-    ctx.requireDocument().requireShape(this.id).scaleBy(1 / this.factor);
+    ctx
+      .requireDocument()
+      .requireShape(this.id)
+      .scaleBy(1 / this.factor);
   }
 
   public successMessage(): string {
-    return `${this.label} scaled by ${this.factor}`;
+    return `${this.label} scaled by ${formatNumber(this.factor)}`;
   }
 
   public undoMessage(): string {
