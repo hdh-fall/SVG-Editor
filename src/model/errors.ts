@@ -1,113 +1,25 @@
-/** Base class for every error whose message is meant to be shown to the user verbatim. */
-export class AppError extends Error {
-  public constructor(message: string) {
-    super(message);
-    this.name = new.target.name;
-  }
-}
-
-export class NoDocumentError extends AppError {
-  public constructor() {
-    super("no document. use 'init' or 'read' first");
-  }
-}
-
-export class DuplicateIdError extends AppError {
-  public constructor(id: string) {
-    super(`id already exists: ${id}`);
-  }
-}
-
-export class NoSuchShapeError extends AppError {
-  public constructor(id: string) {
-    super(`no such shape: ${id}`);
-  }
-}
-
-export class NoSuchContainerError extends AppError {
-  public constructor(id: string) {
-    super(`no such container: ${id}`);
-  }
-}
-
-export class NotAContainerError extends AppError {
-  public constructor(id: string) {
-    super(`not a container: ${id}`);
-  }
-}
-
-export class UnknownShapeTypeError extends AppError {
-  public constructor(type: string) {
-    super(`unknown shape type: ${type} (is the plugin loaded?)`);
-  }
-}
-
-export class UnknownCommandError extends AppError {
-  public constructor(name: string) {
-    super(`unknown command: ${name}`);
-  }
-}
-
-export class UnknownAttributeError extends AppError {
-  public constructor(attr: string) {
-    super(`unknown attribute: ${attr}`);
-  }
-}
-
-export class InvalidScaleFactorError extends AppError {
-  public constructor() {
-    super('scale factor must be positive');
-  }
-}
-
-export class CannotUngroupTopLevelError extends AppError {
-  public constructor(id: string) {
-    super(`cannot ungroup top-level container: ${id}`);
-  }
-}
-
-export class CannotUngroupCompositeError extends AppError {
-  public constructor(id: string) {
-    super(`cannot ungroup composite shape: ${id}`);
-  }
-}
-
-export class CannotGroupIntoDescendantError extends AppError {
-  public constructor(id: string) {
-    super(`cannot group a container into its own descendant: ${id}`);
-  }
-}
-
-export class UndoNotAllowedError extends AppError {
-  public constructor() {
-    super('undo not allowed after io command');
-  }
-}
-
-export class NothingToUndoError extends AppError {
-  public constructor() {
-    super('nothing to undo');
-  }
-}
-
-export class NothingToRedoError extends AppError {
-  public constructor() {
-    super('nothing to redo');
-  }
-}
-
-export class FileError extends AppError {
-  public static read(file: string): FileError {
-    return new FileError(`cannot read file: ${file}`);
-  }
-
-  public static write(file: string): FileError {
-    return new FileError(`cannot write file: ${file}`);
-  }
-}
-
-export class InvalidArgumentError extends AppError {
-  public constructor(detail: string) {
-    super(`invalid argument: ${detail}`);
-  }
-}
+/**
+ * Barrel for the domain error types.
+ *
+ * Each error class lives in its own file named after the class (spec §2.1:
+ * one class per file); this module only re-exports them so call sites keep a
+ * single import path.
+ */
+export { AppError } from './errors/AppError';
+export { NoDocumentError } from './errors/NoDocumentError';
+export { DuplicateIdError } from './errors/DuplicateIdError';
+export { NoSuchShapeError } from './errors/NoSuchShapeError';
+export { NoSuchContainerError } from './errors/NoSuchContainerError';
+export { NotAContainerError } from './errors/NotAContainerError';
+export { UnknownShapeTypeError } from './errors/UnknownShapeTypeError';
+export { UnknownCommandError } from './errors/UnknownCommandError';
+export { UnknownAttributeError } from './errors/UnknownAttributeError';
+export { InvalidScaleFactorError } from './errors/InvalidScaleFactorError';
+export { CannotUngroupTopLevelError } from './errors/CannotUngroupTopLevelError';
+export { CannotUngroupCompositeError } from './errors/CannotUngroupCompositeError';
+export { CannotGroupIntoDescendantError } from './errors/CannotGroupIntoDescendantError';
+export { UndoNotAllowedError } from './errors/UndoNotAllowedError';
+export { NothingToUndoError } from './errors/NothingToUndoError';
+export { NothingToRedoError } from './errors/NothingToRedoError';
+export { FileError } from './errors/FileError';
+export { InvalidArgumentError } from './errors/InvalidArgumentError';
