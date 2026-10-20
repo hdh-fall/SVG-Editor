@@ -1,3 +1,4 @@
+import type { ParsedCommand } from '../parser/CommandParser';
 import type { AppContext } from './AppContext';
 import type { Command } from './Command';
 
@@ -32,7 +33,7 @@ export class HelpCommand implements Command {
   public readonly isUndoable = false;
   public readonly isDisplay = true;
 
-  public static fromArgs(_args: unknown, _ctx: AppContext): HelpCommand {
+  public static fromArgs(_args: ParsedCommand, _ctx: AppContext): HelpCommand {
     return new HelpCommand();
   }
 

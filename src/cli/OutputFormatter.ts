@@ -1,5 +1,3 @@
-import { AppError } from '../model/errors';
-
 /** Turns command results and errors into the exact lines the REPL prints. */
 export class OutputFormatter {
   public banner(): string {
@@ -19,11 +17,9 @@ export class OutputFormatter {
   }
 
   public error(error: unknown): string {
-    const detail = error instanceof AppError
-      ? error.message
-      : error instanceof Error
-        ? error.message
-        : String(error);
-    return `error: ${detail}`;
+    if (error instanceof Error) {
+      return `error: ${error.message}`;
+    }
+    return `error: ${String(error)}`;
   }
 }
